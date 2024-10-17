@@ -1,13 +1,21 @@
 "use client";
 
+import { useState } from "react";
+import TextGenerationForm from "@/components/TextGenerationForm";
 import TranslationForm from "@/components/TranslationForm";
+import Header from "@/components/Header";
 
 export default function Home() {
+  const [generatedText, setGeneratedText] = useState("");
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <main className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4">英語から日本語への翻訳</h1>
-        <TranslationForm />
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <TextGenerationForm onTextGenerated={setGeneratedText} />
+          <TranslationForm initialText={generatedText} />
+        </div>
       </main>
     </div>
   );
