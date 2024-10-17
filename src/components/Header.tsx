@@ -14,35 +14,17 @@ export default function Header() {
           <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
           <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
         </Link>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => setTheme('default')}
-            className={`${theme === 'default' ? 'border-gray-500' : ''}`}
-          >
-            Default
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setTheme('light')}
-            className={`${theme === 'light' ? 'border-blue-500' : ''}`}
-          >
-            Light
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setTheme('dark')}
-            className={`${theme === 'dark' ? 'border-purple-500' : ''}`}
-          >
-            Dark
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setTheme('nature')}
-            className={`${theme === 'nature' ? 'border-green-500' : ''}`}
-          >
-            Nature
-          </Button>
+        <div className="flex space-x-2 overflow-x-auto">
+          {Object.keys(themes).map((themeName) => (
+            <Button
+              key={themeName}
+              variant="outline"
+              onClick={() => setTheme(themeName)}
+              className={`${theme === themeName ? 'border-blue-500' : ''}`}
+            >
+              {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
+            </Button>
+          ))}
           <Button variant="outline">ログイン</Button>
         </div>
       </div>

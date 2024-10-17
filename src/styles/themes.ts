@@ -35,4 +35,14 @@ export const themes = {
     button: "bg-green-600 hover:bg-green-700 text-white",
     input: "bg-white border-green-300",
   },
+  // パステルドリームテーマを保持
+  pastelDream: {
+    background: "bg-[#fef6e4]",
+    text: "text-[#27272a]",
+    card: "bg-[#f9f4ef]",
+    cardBorder: "border-[#eaddcf]",
+    cardText: "text-[#716040]",
+    button: "bg-[#f582ae] hover:bg-[#f26e9e] text-white",
+    input: "bg-white border-[#eaddcf] text-[#27272a]",
+  },
 };
