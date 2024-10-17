@@ -27,7 +27,9 @@ export default function TranslationForm({ textToTranslate }: { textToTranslate: 
       <CardContent className="space-y-4">
         <Card>
           <CardContent className="mt-4">
-            <p className="whitespace-pre-wrap">{translatedText}</p>
+            <div className="h-[200px] overflow-y-auto">
+              <p className="whitespace-pre-wrap">{translatedText}</p>
+            </div>
           </CardContent>
         </Card>
         <Button onClick={handleTranslate} className="w-full">再翻訳</Button>

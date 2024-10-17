@@ -8,7 +8,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
-          <span className="ml-2 text-xl font-bold">Lingo!!</span>
+          <span className="ml-2 text-xl font-bold">/&%#$??!!</span>
         </Link>
         <Button variant="outline">ログイン</Button>
       </div>
