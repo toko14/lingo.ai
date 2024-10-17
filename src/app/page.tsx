@@ -14,7 +14,7 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <TextGenerationForm onTextGenerated={setGeneratedText} />
-          <TranslationForm initialText={generatedText} />
+          <TranslationForm textToTranslate={generatedText} />
         </div>
       </main>
     </div>

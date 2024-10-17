@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { translateText } from "@/utils/translate";
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function TranslationForm({ initialText = "" }: { initialText?: string }) {
-  const [inputText, setInputText] = useState(initialText);
+export default function TranslationForm({ textToTranslate }: { textToTranslate: string }) {
   const [translatedText, setTranslatedText] = useState("");
 
+  useEffect(() => {
+    if (textToTranslate) {
+      handleTranslate();
+    }
+  }, [textToTranslate]);
+
   const handleTranslate = async () => {
-    if (inputText) {
-      const result = await translateText(inputText);
+    if (textToTranslate) {
+      const result = await translateText(textToTranslate);
       setTranslatedText(result);
     }
   };
@@ -18,24 +22,15 @@ export default function TranslationForm({ initialText = "" }: { initialText?: st
   return (
     <Card>
       <CardHeader>
-        <CardTitle>翻訳</CardTitle>
+        <CardTitle>翻訳結果</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Textarea
-          className="min-h-[200px]"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="英語のテキストを入力してください"
-        />
-        <Button onClick={handleTranslate} className="w-full">翻訳</Button>
         <Card>
-          <CardHeader>
-            <CardTitle>翻訳結果</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{translatedText}</p>
+          <CardContent className="mt-4">
+            <p className="whitespace-pre-wrap">{translatedText}</p>
           </CardContent>
         </Card>
+        <Button onClick={handleTranslate} className="w-full">再翻訳</Button>
       </CardContent>
     </Card>
   );
