@@ -1,16 +1,24 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useRouter } from 'next/navigation';
 import TranslationForm from "@/components/TranslationForm";
 import InputTextDisplay from "@/components/InputTextDisplay";
 import Header from "@/components/Header";
 import { themes } from "@/styles/themes";
 
 export default function MainPage() {
-  const searchParams = useSearchParams();
-  const inputText = searchParams.get("text") || "";
+  const [inputText, setInputText] = useState("");
   const { theme } = useTheme();
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedText = sessionStorage.getItem('inputText');
+    if (storedText) {
+      setInputText(storedText);
+    }
+    }, [router]);
 
   return (
     <div className={`flex flex-col min-h-screen ${themes[theme as keyof typeof themes]?.background || ''} ${themes[theme as keyof typeof themes]?.text || ''} transition-colors duration-200`}>
