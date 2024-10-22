@@ -3,6 +3,13 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import { themes } from "@/styles/themes"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from 'lucide-react'
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
@@ -15,34 +22,27 @@ export default function Header() {
           <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
         </Link>
         <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => setTheme('default')}
-            className={`${theme === 'default' ? 'border-gray-500' : ''}`}
-          >
-            Default
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setTheme('light')}
-            className={`${theme === 'light' ? 'border-blue-500' : ''}`}
-          >
-            Light
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setTheme('dark')}
-            className={`${theme === 'dark' ? 'border-purple-500' : ''}`}
-          >
-            Dark
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setTheme('nature')}
-            className={`${theme === 'nature' ? 'border-green-500' : ''}`}
-          >
-            Nature
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center">
+                テーマ <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setTheme('default')}>
+                デフォルト
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('light')}>
+                ライト
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('dark')}>
+                ダーク
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('nature')}>
+                ネイチャー
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="outline">ログイン</Button>
         </div>
       </div>

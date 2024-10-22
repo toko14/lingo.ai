@@ -20,6 +20,11 @@ export default function TextGenerationForm({ onTextGenerated }: { onTextGenerate
     onTextGenerated(text);
   };
 
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setGeneratedText(e.target.value);
+    onTextGenerated(e.target.value);
+  };
+
   return (
     <Card className={`${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border`}>
       <CardHeader>
@@ -53,8 +58,8 @@ export default function TextGenerationForm({ onTextGenerated }: { onTextGenerate
         <Textarea
           className={`min-h-[200px] ${themes[currentTheme as keyof typeof themes]?.input}`}
           value={generatedText}
-          readOnly
-          placeholder="生成されたテキストがここに表示されます"
+          onChange={handleTextareaChange}
+          placeholder="生成されたテキストがここに表示されます。編集も可能です。"
         />
       </CardContent>
     </Card>
