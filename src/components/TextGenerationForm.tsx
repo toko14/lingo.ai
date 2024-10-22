@@ -8,14 +8,27 @@ import { useTheme } from "next-themes";
 import { themes } from "@/styles/themes";
 
 export default function TextGenerationForm({ onTextGenerated }: { onTextGenerated: (text: string) => void }) {
-  const [toeicScore, setToeicScore] = useState(500);
-  const [wordCount, setWordCount] = useState(50);
+  const [toeicScore, setToeicScore] = useState("550");
+  const [wordCount, setWordCount] = useState("100");
   const [theme, setTheme] = useState("");
   const [generatedText, setGeneratedText] = useState("");
   const { theme: currentTheme } = useTheme();
 
   const handleGenerateText = async () => {
-    const text = await generateEnglishText(toeicScore, wordCount, theme);
+    const parsedToeicScore = parseInt(toeicScore) || 550;
+    const parsedWordCount = parseInt(wordCount) || 100;
+
+    if (parsedToeicScore < 10 || parsedToeicScore > 990) {
+      alert("TOEICスコアは10から990の間で入力してください。");
+      return;
+    }
+
+    if (parsedWordCount < 1 || parsedWordCount > 1000) {
+      alert("単語数は1から1000の間で入力してください。");
+      return;
+    }
+
+    const text = await generateEnglishText(parsedToeicScore, parsedWordCount, theme);
     setGeneratedText(text);
     onTextGenerated(text);
   };
@@ -33,17 +46,17 @@ export default function TextGenerationForm({ onTextGenerated }: { onTextGenerate
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-2">
           <Input
-            type="number"
+            type="text"
             value={toeicScore}
-            onChange={(e) => setToeicScore(Number(e.target.value))}
-            placeholder="TOEICスコア"
+            onChange={(e) => setToeicScore(e.target.value)}
+            placeholder="TOEICスコア (10-990)"
             className={themes[currentTheme as keyof typeof themes]?.input}
           />
           <Input
-            type="number"
+            type="text"
             value={wordCount}
-            onChange={(e) => setWordCount(Number(e.target.value))}
-            placeholder="単語数"
+            onChange={(e) => setWordCount(e.target.value)}
+            placeholder="単語数 (1-1000)"
             className={themes[currentTheme as keyof typeof themes]?.input}
           />
           <Input

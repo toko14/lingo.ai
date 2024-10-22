@@ -25,7 +25,7 @@ export default function Home() {
     <div className={`flex flex-col min-h-screen ${themes[theme as keyof typeof themes]?.background || ''} ${themes[theme as keyof typeof themes]?.text || ''} transition-colors duration-200`}>
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <TextGenerationForm onTextGenerated={setInputText} />
           <UrlTextGenerationForm onTextGenerated={setInputText} />
         </div>
