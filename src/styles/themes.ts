@@ -7,6 +7,8 @@ export const themes = {
     cardText: "text-[#4a4a4a]",
     button: "bg-[#5a5a5a] hover:bg-[#4a4a4a] text-white",
     input: "bg-white border-[#d1d1d5] text-[#333333]",
+    userMessage: "bg-blue-500 text-white",
+    assistantMessage: "bg-gray-100 text-gray-900",
   },
   light: {
     background: 'bg-white',
@@ -17,7 +19,9 @@ export const themes = {
     button: 'bg-blue-500 hover:bg-blue-600 text-white',
     input: 'bg-white border-gray-200',
     messageBg: 'bg-gray-100',
-    messageText: 'text-gray-900'
+    messageText: 'text-gray-900',
+    userMessage: "bg-blue-500 text-white",
+    assistantMessage: "bg-gray-100 text-gray-900",
   },
   dark: {
     background: 'bg-gray-900',
@@ -28,7 +32,9 @@ export const themes = {
     button: 'bg-blue-600 hover:bg-blue-700 text-white',
     input: 'bg-gray-700 border-gray-600',
     messageBg: 'bg-gray-800',
-    messageText: 'text-gray-100'
+    messageText: 'text-gray-100',
+    userMessage: "bg-blue-600 text-white",
+    assistantMessage: "bg-gray-700 text-gray-100",
   },
   nature: {
     background: "bg-green-50",
@@ -38,5 +44,7 @@ export const themes = {
     cardText: "text-green-800",
     button: "bg-green-600 hover:bg-green-700 text-white",
     input: "bg-white border-green-300",
+    userMessage: "bg-green-600 text-white",
+    assistantMessage: "bg-green-100 text-green-900",
   },
 };

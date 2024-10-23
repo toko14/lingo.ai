@@ -1,6 +1,7 @@
 "use server";
 
 export const sendDifyRequest = async (
+  initialText: string,
   message: string,
   conversationId?: string
 ) => {
@@ -13,7 +14,7 @@ export const sendDifyRequest = async (
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_CHAT_API_KEY}`,
       },
       body: JSON.stringify({
-        inputs: {"input": "In the realm of innovation, collaboration and interdisciplinary exchange reign supreme."},
+        inputs: {"input": initialText},
         query: message,
         response_mode: "blocking",
         conversation_id: conversationId || "",
@@ -27,6 +28,7 @@ export const sendDifyRequest = async (
       throw new Error(`Dify APIエラー: ${response.status}`);
     }
 
+    console.log("initialText", initialText);
     const data = await response.json();
     return data;
   } catch (error) {

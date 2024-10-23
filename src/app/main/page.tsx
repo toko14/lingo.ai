@@ -31,8 +31,8 @@ export default function MainPage() {
           <TranslationForm textToTranslate={inputText} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <WordList />
-          <ChatComponent />
+          <WordList text={inputText} />
+          <ChatComponent initialText={inputText} />
         </div>
       </main>
     </div>

@@ -3,7 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTheme } from "next-themes";
 import { themes } from "@/styles/themes";
 
-export default function WordList() {
+interface WordListProps {
+  text: string;
+}
+
+export default function WordList({ text }: WordListProps) {
   const { theme: currentTheme } = useTheme();
 
   return (

@@ -11,9 +11,13 @@ interface Message {
   content: string;
 }
 
-export default function ChatComponent() {
+interface ChatComponentProps {
+  initialText?: string;
+}
+
+export default function ChatComponent({ initialText = "" }: ChatComponentProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const { theme: currentTheme } = useTheme();
   const [conversationId, setConversationId] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -28,13 +32,12 @@ export default function ChatComponent() {
     if (!input.trim()) return;
 
     try {
-      // ユーザーメッセージを追加
       setMessages(prev => [...prev, { role: 'user', content: input }]);
       
       const userInput = input;
-      setInput(''); // 入力フィールドをクリア
+      setInput('');
 
-      const result = await sendDifyRequest(userInput, conversationId);
+      const result = await sendDifyRequest(initialText, userInput, conversationId);
       
       if (result && result.answer) {
         setMessages(prev => [...prev, { 
@@ -62,6 +65,12 @@ export default function ChatComponent() {
     }
   };
 
+  const getMessageStyle = (role: 'user' | 'assistant') => {
+    return role === 'user' 
+      ? themes[currentTheme as keyof typeof themes]?.userMessage
+      : themes[currentTheme as keyof typeof themes]?.assistantMessage;
+  };
+
   return (
     <Card className={`${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border h-[600px] flex flex-col`}>
       <CardHeader>
@@ -75,18 +84,14 @@ export default function ChatComponent() {
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`flex items-start gap-2 mb-2 ${
-                message.role === 'user' ? 'flex-row-reverse' : ''
+              className={`flex items-start gap-2 mb-4 ${
+                message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
               }`}
             >
               <div
-                className={`flex flex-col w-full max-w-[320px] leading-1.5 px-3 py-2 border rounded-lg ${
-                  message.role === 'user' 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                }`}
+                className={`flex flex-col w-full max-w-[80%] leading-1.5 p-4 rounded-lg ${getMessageStyle(message.role)}`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm font-medium">{message.content}</p>
               </div>
             </div>
           ))}
