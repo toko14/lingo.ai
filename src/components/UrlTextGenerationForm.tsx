@@ -5,12 +5,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTheme } from "next-themes";
 import { themes } from "@/styles/themes";
+import { generateTextFromUrl } from "@/utils/api";
 
 export default function UrlTextGenerationForm({ onTextGenerated }: { onTextGenerated: (text: string) => void }) {
   const [toeicScore, setToeicScore] = useState("550");
   const [wordCount, setWordCount] = useState("100");
   const [url, setUrl] = useState("");
   const [generatedText, setGeneratedText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { theme: currentTheme } = useTheme();
 
   const handleGenerateText = async () => {
@@ -32,25 +34,16 @@ export default function UrlTextGenerationForm({ onTextGenerated }: { onTextGener
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/generate-text-from-url', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ toeicScore: parsedToeicScore, wordCount: parsedWordCount, url }),
-      });
-
-      if (!response.ok) {
-        throw new Error('テキスト生成に失敗しました');
-      }
-
-      const data = await response.json();
-      setGeneratedText(data.text);
-      onTextGenerated(data.text);
+      const text = await generateTextFromUrl(url, parsedToeicScore, parsedWordCount);
+      setGeneratedText(text);
+      onTextGenerated(text);
     } catch (error) {
       console.error('エラー:', error);
       alert('テキスト生成中にエラーが発生しました');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,7 +81,13 @@ export default function UrlTextGenerationForm({ onTextGenerated }: { onTextGener
             className={themes[currentTheme as keyof typeof themes]?.input}
           />
         </div>
-        <Button onClick={handleGenerateText} className={`w-full ${themes[currentTheme as keyof typeof themes]?.button}`}>テキスト生成</Button>
+        <Button 
+          onClick={handleGenerateText} 
+          className={`w-full ${themes[currentTheme as keyof typeof themes]?.button}`}
+          disabled={isLoading}
+        >
+          {isLoading ? 'テキスト生成中...' : 'テキスト生成'}
+        </Button>
         <Textarea
           className={`min-h-[200px] ${themes[currentTheme as keyof typeof themes]?.input}`}
           value={generatedText}
