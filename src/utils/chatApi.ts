@@ -1,15 +1,19 @@
 "use server";
 
-export async function sendDifyRequest(input_text: string, message: string, conversationId?: string): Promise<any> {
+export const sendDifyRequest = async (
+  message: string,
+  conversationId?: string
+) => {
   try {
+    console.log("api call");
     const response = await fetch("https://api.dify.ai/v1/chat-messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.DIFY_API_KEY}`,
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_CHAT_API_KEY}`,
       },
       body: JSON.stringify({
-        inputs: {"input": input_text},
+        inputs: {"input": "In the realm of innovation, collaboration and interdisciplinary exchange reign supreme."},
         query: message,
         response_mode: "blocking",
         conversation_id: conversationId || "",
@@ -18,15 +22,15 @@ export async function sendDifyRequest(input_text: string, message: string, conve
     });
 
     if (!response.ok) {
-      throw new Error("Dify APIからのレスポンスが正常ではありません");
+      const errorData = await response.json();
+      console.error("API Error:", errorData);
+      throw new Error(`Dify APIエラー: ${response.status}`);
     }
 
-
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Dify APIリクエストエラー:", error);
-    throw new Error("Dify APIリクエスト中にエラーが発生しました");
+    throw error;
   }
-}
+};

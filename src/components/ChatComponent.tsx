@@ -4,54 +4,55 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { themes } from "@/styles/themes";
+import { sendDifyRequest } from "@/utils/chatApi";
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  options?: string[];  // 選択肢を追加
 }
 
 export default function ChatComponent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const { theme: currentTheme } = useTheme();
+  const [conversationId, setConversationId] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 新しいメッセージが追加されたときに自動スクロール
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!input.trim()) return;
 
-    // ユーザーメッセージを追加
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
-    
-    // 仮の応答（選択肢付き）
-    setTimeout(() => {
+    try {
+      // ユーザーメッセージを追加
+      setMessages(prev => [...prev, { role: 'user', content: input }]);
+      
+      const userInput = input;
+      setInput(''); // 入力フィールドをクリア
+
+      const result = await sendDifyRequest(userInput, conversationId);
+      
+      if (result && result.answer) {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: result.answer 
+        }]);
+        
+        if (result.conversation_id) {
+          setConversationId(result.conversation_id);
+        }
+      }
+    } catch (error) {
+      console.error("エラー:", error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "以下のオプションから選択してください：",
-        options: ["オプション1", "オプション2", "オプション3"]
+        content: "申し訳ありませんが、エラーが発生しました。" 
       }]);
-    }, 1000);
-
-    setInput('');
-  };
-
-  const handleOptionClick = (option: string) => {
-    setMessages(prev => [...prev, { role: 'user', content: option }]);
-    
-    // オプション選択後の応答
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `「${option}」を選択しました。` 
-      }]);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -86,21 +87,6 @@ export default function ChatComponent() {
                 }`}
               >
                 <p className="text-sm">{message.content}</p>
-                {message.options && (
-                  <div className="flex flex-col gap-2 mt-2">
-                    {message.options.map((option, optionIndex) => (
-                      <Button
-                        key={optionIndex}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOptionClick(option)}
-                        className="text-sm text-left hover:bg-gray-200 dark:hover:bg-gray-700"
-                      >
-                        {option}
-                      </Button>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           ))}
@@ -111,7 +97,7 @@ export default function ChatComponent() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="メッセージを入力..."
             className={themes[currentTheme as keyof typeof themes]?.input}
           />
