@@ -16,7 +16,26 @@ export default function InputTextDisplay({ text }: InputTextDisplayProps) {
       </CardHeader>
       <CardContent>
         <div className="overflow-y-auto" style={{ maxHeight: 'calc(100% - 60px)', minHeight: '200px' }}>
-          <pre className={`whitespace-pre-wrap break-words ${themes[theme as keyof typeof themes]?.cardText}`}>{text}</pre>
+          <pre 
+            className={`
+              whitespace-pre-wrap 
+              break-words 
+              font-['Helvetica_Neue'] 
+              text-xl 
+              leading-loose 
+              tracking-wider 
+              px-4 
+              py-2 
+              ${themes[theme as keyof typeof themes]?.cardText}
+            `}
+            style={{
+              fontWeight: 400,
+              letterSpacing: '0.03em',
+              lineHeight: 1.8
+            }}
+          >
+            {text}
+          </pre>
         </div>
       </CardContent>
     </Card>

@@ -40,9 +40,13 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
       const result = await sendDifyRequest(initialText, userInput, conversationId);
       
       if (result && result.answer) {
+        const formattedAnswer = typeof result.answer === 'string' 
+          ? result.answer.trim()
+          : result.answer;
+        
         setMessages(prev => [...prev, { 
           role: 'assistant', 
-          content: result.answer 
+          content: formattedAnswer 
         }]);
         
         if (result.conversation_id) {
@@ -91,7 +95,7 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
               <div
                 className={`flex flex-col w-full max-w-[80%] leading-1.5 p-4 rounded-lg ${getMessageStyle(message.role)}`}
               >
-                <p className="text-sm font-medium">{message.content}</p>
+                <p className="text-sm font-medium whitespace-pre-wrap">{message.content}</p>
               </div>
             </div>
           ))}
