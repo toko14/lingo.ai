@@ -21,6 +21,7 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
   const { theme: currentTheme } = useTheme();
   const [conversationId, setConversationId] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -29,9 +30,10 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isWaitingForResponse) return;
 
     try {
+      setIsWaitingForResponse(true);
       setMessages(prev => [...prev, { role: 'user', content: input }]);
       
       const userInput = input;
@@ -59,11 +61,13 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
         role: 'assistant', 
         content: "申し訳ありませんが、エラーが発生しました。" 
       }]);
+    } finally {
+      setIsWaitingForResponse(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isWaitingForResponse) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -109,10 +113,12 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
             onKeyDown={handleKeyPress}
             placeholder="メッセージを入力..."
             className={themes[currentTheme as keyof typeof themes]?.input}
+            disabled={isWaitingForResponse}
           />
           <Button 
             onClick={handleSendMessage}
             className={themes[currentTheme as keyof typeof themes]?.button}
+            disabled={isWaitingForResponse}
           >
             送信
           </Button>
