@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -46,18 +46,22 @@ export default function WordList({
   
   const { words: generatedWords, isLoading, error, generateWords } = useWordList();
 
-  const handleGenerateWords = () => {
-    const params: GenerateWordsParams = {
-      toeic_level: toeicLevel,
-      words: wordCount,
-      text: text
-    };
-    generateWords(params);
-  };
+  const handleGenerateWords = useCallback(() => {
+    if (text.trim()) {
+      const params: GenerateWordsParams = {
+        toeic_level: toeicLevel,
+        words: wordCount,
+        text: text
+      };
+      generateWords(params);
+    }
+  }, [text, toeicLevel, wordCount, generateWords]);
 
   useEffect(() => {
-    handleGenerateWords();
-  }, [text]); // テキストが変更されたときのみ自動生成
+    if (text.trim()) {
+      handleGenerateWords();
+    }
+  }, [text, handleGenerateWords]);
 
   const filteredWords = generatedWords.filter(word => 
     word.english.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,7 +113,7 @@ export default function WordList({
       <CardContent className="p-4">
         {error ? (
           <div className="text-red-500 text-center">{error}</div>
-        ) : (
+        ) : text.trim() ? (
           <div className="flex gap-4 h-full">
             <div className="w-1/3">
               <div className="flex items-center mb-4">
@@ -170,6 +174,10 @@ export default function WordList({
                 </div>
               )}
             </div>
+          </div>
+        ) : (
+          <div className="text-center text-muted-foreground">
+            テキストを入力すると単語リストが生成されます。
           </div>
         )}
       </CardContent>
