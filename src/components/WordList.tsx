@@ -144,6 +144,7 @@ export default function WordList({
             <div className="w-2/3 border-l pl-4">
               {selectedWord ? (
                 <motion.div
+                  key={selectedWord.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
