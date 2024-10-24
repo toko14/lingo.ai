@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { themes } from "@/styles/themes";
 import { sendDifyRequest } from "@/utils/chatApi";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -79,6 +80,11 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
       : themes[currentTheme as keyof typeof themes]?.assistantMessage;
   };
 
+  const messageVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
     <Card className={`${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border h-[600px] flex flex-col`}>
       <CardHeader>
@@ -89,20 +95,26 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
           ref={scrollRef}
           className="h-full overflow-y-auto pr-4"
         >
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-2 mb-4 ${
-                message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-              }`}
-            >
-              <div
-                className={`flex flex-col w-full max-w-[80%] leading-1.5 p-4 rounded-lg ${getMessageStyle(message.role)}`}
+          <AnimatePresence initial={false}>
+            {messages.map((message, index) => (
+              <motion.div
+                key={index}
+                variants={messageVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.2 }}
+                className={`flex items-start gap-2 mb-4 ${
+                  message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                }`}
               >
-                <p className="text-sm font-medium whitespace-pre-wrap">{message.content}</p>
-              </div>
-            </div>
-          ))}
+                <div
+                  className={`flex flex-col w-full max-w-[80%] leading-1.5 p-4 rounded-lg ${getMessageStyle(message.role)}`}
+                >
+                  <p className="text-sm font-medium whitespace-pre-wrap">{message.content}</p>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </CardContent>
       <CardFooter className="border-t p-4">
