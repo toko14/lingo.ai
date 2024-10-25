@@ -68,6 +68,12 @@ export default function WordList({
     word.japanese.includes(searchTerm)
   );
 
+  const handleSpeak = useCallback((text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
   return (
     <Card className={`w-full h-[600px] max-w-4xl ${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border`}>
       <CardHeader className="p-4">
@@ -163,7 +169,11 @@ export default function WordList({
                     </Badge>
                   </div>
                   <p className="mb-4">{selectedWord.example}</p>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={() => handleSpeak(selectedWord.english)}
+                  >
                     <Volume2 className="h-4 w-4" />
                     発音を聞く
                   </Button>
