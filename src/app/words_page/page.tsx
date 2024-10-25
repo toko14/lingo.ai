@@ -274,14 +274,15 @@ export default function WordsPage() {
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[600px]">
-                    <div className="space-y-2">
+                    <div className="space-y-2 px-1"> {/* px-1 を追加 */}
                       {filteredWords.map((word) => (
                         <motion.div
                           key={word.id}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setSelectedWord(word)}
-                          className="p-2 border rounded-md cursor-pointer hover:bg-accent"
+                          className="p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu" // transform-gpu を追加
+                          style={{ transformOrigin: 'center left' }} // transformOrigin を追加
                         >
                           <h3 className="font-semibold">{word.english}</h3>
                           <p className="text-sm text-muted-foreground">{word.japanese}</p>
