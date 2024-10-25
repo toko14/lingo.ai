@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button"
@@ -11,50 +12,59 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation';
+import SignUp from '@/components/SignUp';
+import Login from '@/components/Login';
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
   const router = useRouter();
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleNavigateToWordList = () => {
     router.push('/words_page');
   };
 
   return (
-    <header className={`${themes[theme as keyof typeof themes]?.background || ''} border-b transition-colors duration-200`}>
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
-          <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
-          <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
-        </Link>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleNavigateToWordList}>
-            My単語帳
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center">
-                テーマ <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setTheme('default')}>
-                デフォルト
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme('light')}>
-                ライト
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme('dark')}>
-                ダーク
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme('nature')}>
-                ネイチャー
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline">ログイン</Button>
+    <>
+      <header className={`${themes[theme as keyof typeof themes]?.background || ''} border-b transition-colors duration-200`}>
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
+            <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
+          </Link>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleNavigateToWordList}>
+              My単語帳
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center">
+                  テーマ <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setTheme('default')}>
+                  デフォルト
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('light')}>
+                  ライト
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                  ダーク
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('nature')}>
+                  ネイチャー
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button variant="outline" onClick={() => setShowLogin(true)}>ログイン</Button>
+            <Button variant="default" onClick={() => setShowSignUp(true)}>サインアップ</Button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      {showSignUp && <SignUp onClose={() => setShowSignUp(false)} />}
+      {showLogin && <Login onClose={() => setShowLogin(false)} />}
+    </>
   );
 }
