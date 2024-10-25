@@ -273,16 +273,16 @@ export default function WordsPage() {
                   <CardTitle>単語リスト</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ScrollArea className="h-[600px]">
-                    <div className="space-y-2 px-1"> {/* px-1 を追加 */}
+                  <ScrollArea className="h-[600px] pr-4"> {/* pr-4 を追加 */}
+                    <div className="space-y-2 px-1">
                       {filteredWords.map((word) => (
                         <motion.div
                           key={word.id}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setSelectedWord(word)}
-                          className="p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu" // transform-gpu を追加
-                          style={{ transformOrigin: 'center left' }} // transformOrigin を追加
+                          className="p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu"
+                          style={{ transformOrigin: 'center left' }}
                         >
                           <h3 className="font-semibold">{word.english}</h3>
                           <p className="text-sm text-muted-foreground">{word.japanese}</p>
@@ -370,15 +370,17 @@ export default function WordsPage() {
                 スコア: {score} / {quizQuestions.length}
               </h2>
               <Progress value={(score / quizQuestions.length) * 100} className="mb-6" />
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {quizQuestions.map((question, index) => (
-                  <div key={index} className="flex items-center justify-center p-2 border rounded">
-                    <span className="mr-2">{question.word.english}</span>
-                    {answers[index] ? (
-                      <CheckCircle2 className="text-green-500" />
-                    ) : (
-                      <XCircle className="text-red-500" />
-                    )}
+                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <span className="mr-2 flex-grow">{question.word.english}</span>
+                    <span className="flex-shrink-0">
+                      {answers[index] ? (
+                        <CheckCircle2 className="text-green-500 h-6 w-6" />
+                      ) : (
+                        <XCircle className="text-red-500 h-6 w-6" />
+                      )}
+                    </span>
                   </div>
                 ))}
               </div>

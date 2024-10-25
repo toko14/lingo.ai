@@ -134,15 +134,16 @@ export default function WordList({
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
-              <ScrollArea className="h-[calc(600px-16rem)]">
-                <div className="space-y-2">
+              <ScrollArea className="h-[calc(600px-16rem)] pr-4">
+                <div className="space-y-2 px-1">
                   {filteredWords.map((word) => (
                     <motion.div
                       key={word.id}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setSelectedWord(word)}
-                      className="p-2 border rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
+                      className="p-2 border rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors transform-gpu"
+                      style={{ transformOrigin: 'center left' }}
                     >
                       <h3 className="font-semibold">{word.english}</h3>
                       <p className="text-sm text-muted-foreground">{word.japanese}</p>
