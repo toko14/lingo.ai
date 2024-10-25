@@ -11,8 +11,10 @@ export default function InputTextDisplay({ text }: InputTextDisplayProps) {
 
   return (
     <Card className={`${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder} border h-full`}>
-      <CardHeader>
-        <CardTitle className={themes[theme as keyof typeof themes]?.cardText}>入力されたテキスト</CardTitle>
+      <CardHeader className="p-4">
+        <CardTitle className={`text-2xl font-bold text-center ${themes[theme as keyof typeof themes]?.cardText}`}>
+          入力されたテキスト
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-y-auto" style={{ maxHeight: 'calc(100% - 60px)', minHeight: '200px' }}>

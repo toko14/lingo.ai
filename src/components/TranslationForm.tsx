@@ -36,8 +36,10 @@ export default function TranslationForm({ textToTranslate }: { textToTranslate: 
 
   return (
     <Card className={`${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder} border h-full flex flex-col`}>
-      <CardHeader>
-        <CardTitle className={themes[theme as keyof typeof themes]?.cardText}>翻訳結果</CardTitle>
+      <CardHeader className="p-4">
+        <CardTitle className={`text-2xl font-bold text-center ${themes[theme as keyof typeof themes]?.cardText}`}>
+          翻訳結果
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col">
         <div className="flex-grow overflow-y-auto mb-4">
