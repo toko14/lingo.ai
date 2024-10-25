@@ -10,9 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from 'lucide-react'
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
+  const router = useRouter();
+
+  const handleNavigateToWordList = () => {
+    router.push('/words_page');
+  };
 
   return (
     <header className={`${themes[theme as keyof typeof themes]?.background || ''} border-b transition-colors duration-200`}>
@@ -22,6 +28,9 @@ export default function Header() {
           <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
         </Link>
         <div className="flex space-x-2">
+          <Button variant="outline" onClick={handleNavigateToWordList}>
+            My単語帳
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center">
