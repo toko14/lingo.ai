@@ -97,31 +97,42 @@ export default function Header() {
     <>
       <header className={`${themes[theme as keyof typeof themes]?.background || ''} border-b transition-colors duration-200`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center">
-            <Image 
-              src={`/logo${logoNumber}.png`} 
-              alt="Logo" 
-              width={60} 
-              height={60} 
-              className="shadow-lg"
-            />
+          <Link href="/" className="flex items-center group">
+            <div className="relative">
+              <Image 
+                src={`/logo${logoNumber}.png`} 
+                alt="Logo" 
+                width={65} 
+                height={65} 
+                className="shadow-lg transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
             <div className="ml-4 flex flex-col">
-              <span className={`text-4xl font-extrabold tracking-tight ${themes[theme as keyof typeof themes]?.text || ''}`}>
-                Lingo
-                <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">.ai</span>
+              <div className="flex items-baseline">
+                <span className={`text-5xl font-black tracking-tight ${themes[theme as keyof typeof themes]?.text || ''} background-animate`}>
+                  Lingo
+                  <span className="bg-gradient-to-r from-blue-600 via-purple-500 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">.ai</span>
+                </span>
+                <span className="ml-2 px-2 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-md">
+                  Beta
+                </span>
+              </div>
+              <span className="text-sm font-medium text-muted-foreground mt-1">
+                AIで効率的に英語を学習
               </span>
-              <span className="text-sm text-muted-foreground">AIで学ぶ英単語</span>
             </div>
           </Link>
-          <nav className="flex space-x-2">
+          <nav className="flex items-center space-x-3">
             <Button
               variant="ghost"
-              className="text-sm font-medium transition-colors hover:text-primary flex items-center"
+              className="text-sm font-medium transition-all duration-200 hover:text-primary hover:scale-105 flex items-center"
               onClick={() => router.push('/words_page')}
             >
+              <Book className="mr-2 h-4 w-4" />
               My単語帳
               {session && wordCount !== null && (
-                <Badge variant="secondary" className="ml-2 text-xs">
+                <Badge variant="secondary" className="ml-2 text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                   {wordCount} / 200
                 </Badge>
               )}
