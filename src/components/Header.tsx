@@ -19,7 +19,7 @@ import { Session } from '@supabase/supabase-js'
 import { Badge } from "@/components/ui/badge";
 
 export default function Header() {
-  const { theme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const router = useRouter();
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -41,7 +41,7 @@ export default function Header() {
 
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
-/*
+
   const handleNavigateToWordList = () => {
     router.push('/words_page');
   };
@@ -57,7 +57,7 @@ export default function Header() {
       alert('ログアウト処理中にエラーが発生しました');
     }
   };
-*/
+
   const refreshSession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     setSession(session);
@@ -146,16 +146,16 @@ export default function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48">
-                <DropdownMenuItem className="text-base py-2">
+                <DropdownMenuItem onClick={() => setTheme("system")} className="text-base py-2">
                   デフォルト
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-base py-2">
+                <DropdownMenuItem onClick={() => setTheme("light")} className="text-base py-2">
                   ライト
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-base py-2">
+                <DropdownMenuItem onClick={() => setTheme("dark")} className="text-base py-2">
                   ダーク
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-base py-2">
+                <DropdownMenuItem onClick={() => setTheme("nature")} className="text-base py-2">
                   ネイチャー
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -171,17 +171,17 @@ export default function Header() {
               <DropdownMenuContent className="w-48">
                 {!session ? (
                   <>
-                    <DropdownMenuItem className="text-base py-2">
+                    <DropdownMenuItem onClick={() => setShowLogin(true)} className="text-base py-2">
                       <LogIn className="mr-2 h-5 w-5" />
                       ログイン
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-base py-2">
+                    <DropdownMenuItem onClick={() => setShowSignUp(true)} className="text-base py-2">
                       <UserPlus className="mr-2 h-5 w-5" />
                       サインアップ
                     </DropdownMenuItem>
                   </>
                 ) : (
-                  <DropdownMenuItem className="text-base py-2">
+                  <DropdownMenuItem onClick={handleLogout} className="text-base py-2">
                     <LogOut className="mr-2 h-5 w-5" />
                     ログアウト
                   </DropdownMenuItem>
