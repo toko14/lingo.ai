@@ -12,6 +12,7 @@ import { useTheme } from "next-themes";
 import { themes } from "@/styles/themes";
 import { useWordList } from '@/hooks/useWordList';
 import { GenerateWordsParams } from '@/types/word';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 type Word = {
   id: number;
@@ -43,7 +44,12 @@ export default function WordList({
   const [selectedWord, setSelectedWord] = useState<Word | null>(null);
   const [toeicLevel, setToeicLevel] = useState(initialToeicLevel);
   const [wordCount, setWordCount] = useState(initialWordCount);
-  
+  const supabase = createClientComponentClient();
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
   const { words: generatedWords, isLoading, error, generateWords } = useWordList();
 
   const handleGenerateWords = useCallback(() => {
@@ -74,8 +80,84 @@ export default function WordList({
     window.speechSynthesis.speak(utterance);
   }, []);
 
+  // 通知を表示する関数
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setNotification({ message, type });
+    // 3秒後に通知を消す
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
+  // 単語を保存する関数
+  const handleSaveWord = async (word: Word) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        showNotification('単語を保存するにはログインが必要です', 'error');
+        return;
+      }
+
+      // まず既存の単語をチェック
+      const { data: existingWord } = await supabase
+        .from('user_words')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .eq('word_id', word.id)
+        .single();
+
+      if (existingWord) {
+        showNotification(`「${word.english}」は既に単語帳に保存されています`, 'error');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_words')
+        .insert({
+          user_id: session.user.id,
+          word_id: word.id,
+          english: word.english,
+          japanese: word.japanese,
+          part_of_speech: word.partOfSpeech,
+          example: word.example
+        });
+
+      if (error) {
+        // 一意制約違反のエラーをチェック
+        if (error.code === '23505') {
+          showNotification(`「${word.english}」は既に単語帳に保存されています`, 'error');
+          return;
+        }
+        throw error;
+      }
+
+      showNotification(`「${word.english}」を単語帳に保存しました`, 'success');
+
+    } catch (error) {
+      console.error('単語の保存中にエラーが発生しました:', error);
+      showNotification('単語の保存に失敗しました', 'error');
+    }
+  };
+
   return (
-    <Card className={`w-full h-[600px] max-w-4xl ${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border`}>
+    <Card className={`w-full h-[600px] max-w-4xl ${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border relative`}>
+      {/* 通知メッセージ */}
+      {notification && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className={`absolute top-4 right-4 z-50 p-4 rounded-md shadow-lg ${
+            notification.type === 'success' 
+              ? 'bg-green-500 text-white' 
+              : 'bg-red-500 text-white'
+          }`}
+        >
+          {notification.message}
+        </motion.div>
+      )}
+
       <CardHeader className="p-4">
         <CardTitle className={`text-2xl font-bold text-center ${themes[currentTheme as keyof typeof themes]?.cardText}`}>
           単語リスト
@@ -170,14 +252,22 @@ export default function WordList({
                     </Badge>
                   </div>
                   <p className="mb-4">{selectedWord.example}</p>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2"
-                    onClick={() => handleSpeak(selectedWord.english)}
-                  >
-                    <Volume2 className="h-4 w-4" />
-                    発音を聞く
-                  </Button>
+                  <div className="flex gap-2 mt-4">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => handleSpeak(selectedWord.english)}
+                    >
+                      <Volume2 className="h-4 w-4" />
+                      発音を聞く
+                    </Button>
+                    <Button 
+                      variant="default"
+                      onClick={() => handleSaveWord(selectedWord)}
+                    >
+                      単語帳に保存
+                    </Button>
+                  </div>
                 </motion.div>
               ) : (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
