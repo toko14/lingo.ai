@@ -4,16 +4,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { X } from 'lucide-react'
 import { useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 interface LoginProps {
   onClose: () => void;
+  refreshSession: () => Promise<void>;
 }
 
-export default function Login({ onClose }: LoginProps) {
+export default function Login({ onClose, refreshSession }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [currentPath, setCurrentPath] = useState('');
   const router = useRouter();
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     // コンポーネントがマウントされたときに現在のパスを保存
@@ -23,28 +26,21 @@ export default function Login({ onClose }: LoginProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (response.ok) {
-        // ログイン成功
-        alert('ログインに成功しました');
-        onClose();
-        // 現在のパスに戻る（ただし、現在のパスが空の場合はホームページに戻る）
-        router.push(currentPath || '/');
-      } else {
-        // ログイン失敗
-        const data = await response.json();
-        alert(data.error || 'ログインに失敗しました');
-      }
+      if (error) throw error;
+
+      // ログイン成功
+      alert('ログインに成功しました');
+      await refreshSession(); // セッション状態を更新
+      onClose();
+      router.push(currentPath || '/');
     } catch (error) {
       console.error('ログイン処理中にエラーが発生しました', error);
-      alert('ログイン処理中にエラーが発生しました');
+      alert('ログインに失敗しました');
     }
   };
 

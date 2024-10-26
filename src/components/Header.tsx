@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button"
@@ -14,12 +14,30 @@ import { ChevronDown, User, Book, Palette, LogOut, LogIn, UserPlus } from 'lucid
 import { useRouter } from 'next/navigation';
 import SignUp from '@/components/SignUp';
 import Login from '@/components/Login';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { Session } from '@supabase/supabase-js'
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
   const router = useRouter();
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
 
   const handleNavigateToWordList = () => {
     router.push('/words_page');
@@ -27,20 +45,20 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/auth/logout', { method: 'POST' });
-      if (response.ok) {
-        // ログアウト成功時の処理
-        alert('ログアウトに成功しました');
-        router.push('/');
-      } else {
-        console.error('ログアウトに失敗しました');
-        alert('ログアウトに失敗しました');
-      }
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      alert('ログアウトに成功しました');
+      router.push('/');
     } catch (error) {
       console.error('ログアウト処理中にエラーが発生しました', error);
       alert('ログアウト処理中にエラーが発生しました');
     }
   };
+
+  const refreshSession = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setSession(session);
+  }, [supabase.auth]);
 
   return (
     <>
@@ -87,25 +105,30 @@ export default function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setShowLogin(true)}>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  ログイン
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowSignUp(true)}>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  サインアップ
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  ログアウト
-                </DropdownMenuItem>
+                {!session ? (
+                  <>
+                    <DropdownMenuItem onClick={() => setShowLogin(true)}>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      ログイン
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setShowSignUp(true)}>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      サインアップ
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    ログアウト
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
       </header>
       {showSignUp && <SignUp onClose={() => setShowSignUp(false)} />}
-      {showLogin && <Login onClose={() => setShowLogin(false)} />}
+      {showLogin && <Login onClose={() => setShowLogin(false)} refreshSession={refreshSession} />}
     </>
   );
 }
