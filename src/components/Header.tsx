@@ -123,66 +123,66 @@ export default function Header() {
               </span>
             </div>
           </Link>
-          <nav className="flex items-center space-x-3">
+          <nav className="flex items-center space-x-4">
             <Button
               variant="ghost"
-              className="text-sm font-medium transition-all duration-200 hover:text-primary hover:scale-105 flex items-center"
+              className="text-base font-medium transition-all duration-200 hover:text-primary hover:scale-105 flex items-center h-11 px-4"
               onClick={() => router.push('/words_page')}
             >
-              <Book className="mr-2 h-4 w-4" />
+              <Book className="mr-2 h-5 w-5" />
               My単語帳
               {session && wordCount !== null && (
-                <Badge variant="secondary" className="ml-2 text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                <Badge variant="secondary" className="ml-2 text-sm bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                   {wordCount} / 200
                 </Badge>
               )}
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center">
-                  <Palette className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="flex items-center h-11 px-4 text-base">
+                  <Palette className="mr-2 h-5 w-5" />
                   テーマ
-                  <ChevronDown className="ml-2 h-4 w-4" />
+                  <ChevronDown className="ml-2 h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setTheme('default')}>
+              <DropdownMenuContent className="w-48">
+                <DropdownMenuItem className="text-base py-2">
                   デフォルト
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('light')}>
+                <DropdownMenuItem className="text-base py-2">
                   ライト
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                <DropdownMenuItem className="text-base py-2">
                   ダーク
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('nature')}>
+                <DropdownMenuItem className="text-base py-2">
                   ネイチャー
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center">
-                  <User className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="flex items-center h-11 px-4 text-base">
+                  <User className="mr-2 h-5 w-5" />
                   ユーザー
-                  <ChevronDown className="ml-2 h-4 w-4" />
+                  <ChevronDown className="ml-2 h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent className="w-48">
                 {!session ? (
                   <>
-                    <DropdownMenuItem onClick={() => setShowLogin(true)}>
-                      <LogIn className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem className="text-base py-2">
+                      <LogIn className="mr-2 h-5 w-5" />
                       ログイン
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setShowSignUp(true)}>
-                      <UserPlus className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem className="text-base py-2">
+                      <UserPlus className="mr-2 h-5 w-5" />
                       サインアップ
                     </DropdownMenuItem>
                   </>
                 ) : (
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="text-base py-2">
+                    <LogOut className="mr-2 h-5 w-5" />
                     ログアウト
                   </DropdownMenuItem>
                 )}
