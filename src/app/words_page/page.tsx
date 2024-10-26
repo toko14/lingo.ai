@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Header from '@/components/Header'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -30,7 +31,7 @@ const words: Word[] = [
     id: "1",
     english: "hello",
     japanese: "こんにちは",
-    partOfSpeech: "感動詞",
+    partOfSpeech: "���動詞",
     example: "Hello, how are you?"
   },
   // 他の単語データ...
@@ -126,7 +127,7 @@ const dummyWords: Word[] = [
     id: "13",
     english: "innovative",
     japanese: "革新的な",
-    partOfSpeech: "形容詞",
+    partOfSpeech: "形容���",
     example: "The company is known for its innovative approach to problem-solving."
   },
   {
@@ -175,7 +176,10 @@ interface QuizQuestion {
 export default function WordsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedWord, setSelectedWord] = useState<Word | null>(null)
-  const [words, setWords] = useState<Word[]>(dummyWords)
+  const [words, setWords] = useState<Word[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const supabase = createClientComponentClient()
   const { speak } = useSpeech()
   const [quizMode, setQuizMode] = useState(false)
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
@@ -184,6 +188,8 @@ export default function WordsPage() {
   const [score, setScore] = useState(0)
   const [quizFinished, setQuizFinished] = useState(false)
   const [answers, setAnswers] = useState<boolean[]>([])
+  const [isDummyData, setIsDummyData] = useState(false)
+  const [savedWordsCount, setSavedWordsCount] = useState<number>(0)
 
   const filteredWords = words.filter(word => 
     word.english.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -238,13 +244,78 @@ export default function WordsPage() {
     setAnswers([])
   }
 
+  // 保存済み単語数を取得する関数
+  const fetchSavedWordsCount = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return 0
+
+    const { count } = await supabase
+      .from('user_words')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id)
+
+    return count || 0
+  }
+
+  // 単語データをフェッチ�����関数
+  const fetchWords = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        setWords(dummyWords)
+        setIsDummyData(true)
+        setSavedWordsCount(0)
+        setIsLoading(false)
+        return
+      }
+
+      const [{ data, error }, count] = await Promise.all([
+        supabase
+          .from('user_words')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false }),
+        fetchSavedWordsCount()
+      ])
+
+      if (error) throw error
+
+      setWords(data.map(word => ({
+        id: word.word_id.toString(),
+        english: word.english,
+        japanese: word.japanese,
+        partOfSpeech: word.part_of_speech,
+        example: word.example
+      })))
+      setSavedWordsCount(count)
+      setIsDummyData(false)
+
+    } catch (error) {
+      console.error('単語の取得中にエラーが発生しました:', error)
+      setError('単語の取得に失敗しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // コンポーネントマウント時に単語をフェッチ
+  useEffect(() => {
+    fetchWords()
+  }, [])
+
   return (
     <div>
       <Header />
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold text-center mb-6">My単語帳</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">My単語帳</h1>
         
-        {!quizMode && !quizFinished ? (
+        {error ? (
+          <div className="text-red-500 text-center p-4">{error}</div>
+        ) : !quizMode && !quizFinished ? (
           <>
             <div className="flex gap-4 mb-4">
               <Input
@@ -270,25 +341,43 @@ export default function WordsPage() {
             <div className="flex gap-4">
               <Card className="w-1/3">
                 <CardHeader>
-                  <CardTitle>単語リスト</CardTitle>
+                  <CardTitle>
+                    単語リスト
+                    {isLoading && <span className="ml-2 text-sm text-muted-foreground">読み込み中...</span>}
+                  </CardTitle>
+                  {isDummyData && (
+                    <div className="text-sm text-yellow-600 dark:text-yellow-500">
+                      ※ これはサンプルデータです。単語を保存するにはログインしてください。
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <ScrollArea className="h-[600px] pr-4"> {/* pr-4 を追加 */}
-                    <div className="space-y-2 px-1">
-                      {filteredWords.map((word) => (
-                        <motion.div
-                          key={word.id}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setSelectedWord(word)}
-                          className="p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu"
-                          style={{ transformOrigin: 'center left' }}
-                        >
-                          <h3 className="font-semibold">{word.english}</h3>
-                          <p className="text-sm text-muted-foreground">{word.japanese}</p>
-                        </motion.div>
-                      ))}
-                    </div>
+                  <ScrollArea className="h-[600px] pr-4">
+                    {isLoading ? (
+                      <div className="flex justify-center items-center h-full">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                      </div>
+                    ) : words.length === 0 ? (
+                      <div className="text-center text-muted-foreground p-4">
+                        保存された単語がありません
+                      </div>
+                    ) : (
+                      <div className="space-y-2 px-1">
+                        {filteredWords.map((word) => (
+                          <motion.div
+                            key={word.id}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setSelectedWord(word)}
+                            className="p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu"
+                            style={{ transformOrigin: 'center left' }}
+                          >
+                            <h3 className="font-semibold">{word.english}</h3>
+                            <p className="text-sm text-muted-foreground">{word.japanese}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </ScrollArea>
                 </CardContent>
               </Card>

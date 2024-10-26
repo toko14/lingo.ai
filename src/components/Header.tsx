@@ -16,6 +16,7 @@ import SignUp from '@/components/SignUp';
 import Login from '@/components/Login';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Session } from '@supabase/supabase-js'
+import { Badge } from "@/components/ui/badge";
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
@@ -23,6 +24,7 @@ export default function Header() {
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [wordCount, setWordCount] = useState<number | null>(null);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -60,6 +62,30 @@ export default function Header() {
     setSession(session);
   }, [supabase.auth]);
 
+  // 単語数を取得する関数
+  const fetchWordCount = useCallback(async () => {
+    if (session) {
+      const { count, error } = await supabase
+        .from('user_words')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', session.user.id);
+      
+      if (error) {
+        console.error('単語数の取得に失敗しました:', error);
+      } else {
+        setWordCount(count);
+      }
+    }
+  }, [session, supabase]);
+
+  useEffect(() => {
+    if (session) {
+      fetchWordCount();
+    } else {
+      setWordCount(null);
+    }
+  }, [session, fetchWordCount]);
+
   return (
     <>
       <header className={`${themes[theme as keyof typeof themes]?.background || ''} border-b transition-colors duration-200`}>
@@ -68,63 +94,74 @@ export default function Header() {
             <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
             <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
           </Link>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleNavigateToWordList} className="flex items-center">
-              <Book className="mr-2 h-4 w-4" />
-              My単語帳
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center">
-                  <Palette className="mr-2 h-4 w-4" />
-                  テーマ
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setTheme('default')}>
-                  デフォルト
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('light')}>
-                  ライト
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>
-                  ダーク
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('nature')}>
-                  ネイチャー
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center">
-                  <User className="mr-2 h-4 w-4" />
-                  ユーザー
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {!session ? (
-                  <>
-                    <DropdownMenuItem onClick={() => setShowLogin(true)}>
-                      <LogIn className="mr-2 h-4 w-4" />
-                      ログイン
+          <nav className="flex space-x-2">
+            {session && (
+              <>
+                <Link
+                  href="/words_page"
+                  className="text-sm font-medium transition-colors hover:text-primary flex items-center"
+                >
+                  My単語帳
+                  {wordCount !== null && (
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      {wordCount} / 200
+                    </Badge>
+                  )}
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center">
+                      <Palette className="mr-2 h-4 w-4" />
+                      テーマ
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setTheme('default')}>
+                      デフォルト
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setShowSignUp(true)}>
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      サインアップ
+                    <DropdownMenuItem onClick={() => setTheme('light')}>
+                      ライト
                     </DropdownMenuItem>
-                  </>
-                ) : (
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    ログアウト
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                    <DropdownMenuItem onClick={() => setTheme('dark')}>
+                      ダーク
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme('nature')}>
+                      ネイチャー
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      ユーザー
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {!session ? (
+                      <>
+                        <DropdownMenuItem onClick={() => setShowLogin(true)}>
+                          <LogIn className="mr-2 h-4 w-4" />
+                          ログイン
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowSignUp(true)}>
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          サインアップ
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        ログアウト
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+          </nav>
         </div>
       </header>
       {showSignUp && <SignUp onClose={() => setShowSignUp(false)} />}
