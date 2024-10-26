@@ -15,6 +15,7 @@ export default function Login({ onClose, refreshSession }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [currentPath, setCurrentPath] = useState('');
+  const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
   const supabase = createClientComponentClient();
 
@@ -44,14 +45,31 @@ export default function Login({ onClose, refreshSession }: LoginProps) {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset`,
+      });
+
+      if (error) throw error;
+
+      alert('パスワードリセットのメールを送信しました。メールをご確認ください。');
+      setIsResetMode(false);
+    } catch (error) {
+      console.error('パスワードリセット処理中にエラーが発生しました', error);
+      alert('パスワードリセットに失敗しました');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-8 max-w-md w-full relative">
         <button onClick={onClose} className="absolute top-4 right-4">
           <X className="h-6 w-6 text-gray-500 hover:text-gray-700" />
         </button>
-        <h2 className="text-2xl font-bold mb-6">ログイン</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <h2 className="text-2xl font-bold mb-6">{isResetMode ? 'パスワードリセット' : 'ログイン'}</h2>
+        <form onSubmit={isResetMode ? handleResetPassword : handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="email">メールアドレス</Label>
             <Input
@@ -62,18 +80,30 @@ export default function Login({ onClose, refreshSession }: LoginProps) {
               required
             />
           </div>
-          <div>
-            <Label htmlFor="password">パスワード</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full">ログイン</Button>
+          {!isResetMode && (
+            <div>
+              <Label htmlFor="password">パスワード</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+          )}
+          <Button type="submit" className="w-full">
+            {isResetMode ? 'リセットメールを送信' : 'ログイン'}
+          </Button>
         </form>
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => setIsResetMode(!isResetMode)}
+            className="text-blue-500 hover:underline"
+          >
+            {isResetMode ? 'ログインに戻る' : 'パスワードを忘れた場合'}
+          </button>
+        </div>
       </div>
     </div>
   );
