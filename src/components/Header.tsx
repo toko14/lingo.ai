@@ -19,7 +19,7 @@ import { Session } from '@supabase/supabase-js'
 import { Badge } from "@/components/ui/badge";
 
 export default function Header() {
-  const { theme, setTheme } = useTheme()
+  const { theme } = useTheme()
   const router = useRouter();
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -41,7 +41,7 @@ export default function Header() {
 
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
-
+/*
   const handleNavigateToWordList = () => {
     router.push('/words_page');
   };
@@ -57,7 +57,7 @@ export default function Header() {
       alert('ログアウト処理中にエラーが発生しました');
     }
   };
-
+*/
   const refreshSession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     setSession(session);

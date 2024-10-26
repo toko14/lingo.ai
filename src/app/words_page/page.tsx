@@ -246,7 +246,7 @@ export default function WordsPage() {
     setQuizQuestions([])
     setAnswers([])
   }
-
+/*
   // 保存済み単語数を取得する関数
   const fetchSavedWordsCount = async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -259,7 +259,7 @@ export default function WordsPage() {
 
     return count || 0
   }
-
+*/
   // 単語データをフェッチ関数
   const fetchWords = async () => {
     try {
