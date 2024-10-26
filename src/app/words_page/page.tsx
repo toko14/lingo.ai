@@ -14,6 +14,8 @@ import { Volume2 } from 'lucide-react'
 import { useSpeech } from '@/hooks/useSpeech'
 import { Progress } from '@/components/ui/progress'
 import { CheckCircle2, XCircle } from 'lucide-react'
+import { useTheme } from "next-themes"
+import { themes } from "@/styles/themes"
 
 // ... 単語データの型定義とサンプルデータは同じ ...
 
@@ -31,7 +33,7 @@ const words: Word[] = [
     id: "1",
     english: "hello",
     japanese: "こんにちは",
-    partOfSpeech: "���動詞",
+    partOfSpeech: "動詞",
     example: "Hello, how are you?"
   },
   // 他の単語データ...
@@ -127,7 +129,7 @@ const dummyWords: Word[] = [
     id: "13",
     english: "innovative",
     japanese: "革新的な",
-    partOfSpeech: "形容���",
+    partOfSpeech: "形容",
     example: "The company is known for its innovative approach to problem-solving."
   },
   {
@@ -190,6 +192,7 @@ export default function WordsPage() {
   const [answers, setAnswers] = useState<boolean[]>([])
   const [isDummyData, setIsDummyData] = useState(false)
   const [savedWordsCount, setSavedWordsCount] = useState<number>(0)
+  const { theme } = useTheme()
 
   const filteredWords = words.filter(word => 
     word.english.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -257,7 +260,7 @@ export default function WordsPage() {
     return count || 0
   }
 
-  // 単語データをフェッチ�����関数
+  // 単語データをフェッチ関数
   const fetchWords = async () => {
     try {
       setIsLoading(true)
@@ -308,9 +311,9 @@ export default function WordsPage() {
   }, [])
 
   return (
-    <div>
+    <div className={`min-h-screen ${themes[theme as keyof typeof themes]?.background}`}>
       <Header />
-      <div className="container mx-auto p-4">
+      <div className={`container mx-auto p-4 ${themes[theme as keyof typeof themes]?.text}`}>
         <h1 className="text-3xl font-bold mb-6 text-center">My単語帳</h1>
         
         {error ? (
@@ -323,10 +326,10 @@ export default function WordsPage() {
                 placeholder="単語を検索..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
+                className={`w-full ${themes[theme as keyof typeof themes]?.input}`}
               />
               <Select value={quizSize} onValueChange={setQuizSize}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className={`w-[180px] ${themes[theme as keyof typeof themes]?.input}`}>
                   <SelectValue placeholder="クイズの単語数" />
                 </SelectTrigger>
                 <SelectContent>
@@ -335,13 +338,13 @@ export default function WordsPage() {
                   <SelectItem value="15">15問</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={generateQuiz}>クイズを始める</Button>
+              <Button onClick={generateQuiz} className={themes[theme as keyof typeof themes]?.button}>クイズを始める</Button>
             </div>
 
             <div className="flex gap-4">
-              <Card className="w-1/3">
+              <Card className={`w-1/3 ${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder}`}>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className={themes[theme as keyof typeof themes]?.cardText}>
                     単語リスト
                     {isLoading && <span className="ml-2 text-sm text-muted-foreground">読み込み中...</span>}
                   </CardTitle>
@@ -369,7 +372,7 @@ export default function WordsPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setSelectedWord(word)}
-                            className="p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu"
+                            className={`p-2 border rounded-md cursor-pointer hover:bg-accent transform-gpu ${themes[theme as keyof typeof themes]?.cardText}`}
                             style={{ transformOrigin: 'center left' }}
                           >
                             <h3 className="font-semibold">{word.english}</h3>
@@ -382,9 +385,9 @@ export default function WordsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="w-2/3">
+              <Card className={`w-2/3 ${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder}`}>
                 <CardHeader>
-                  <CardTitle>単語の詳細</CardTitle>
+                  <CardTitle className={themes[theme as keyof typeof themes]?.cardText}>単語の詳細</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <AnimatePresence mode="wait">
@@ -398,7 +401,7 @@ export default function WordsPage() {
                       >
                         <div className="flex justify-between items-start mb-4">
                           <div>
-                            <h2 className="text-2xl font-bold">{selectedWord.english}</h2>
+                            <h2 className={`text-2xl font-bold ${themes[theme as keyof typeof themes]?.cardText}`}>{selectedWord.english}</h2>
                             <p className="text-xl text-muted-foreground">{selectedWord.japanese}</p>
                           </div>
                           <Badge variant="secondary" className="text-sm">
@@ -408,7 +411,7 @@ export default function WordsPage() {
                         <p className="mb-4">{selectedWord.example}</p>
                         <Button 
                           variant="outline" 
-                          className="flex items-center gap-2"
+                          className={`flex items-center gap-2 ${themes[theme as keyof typeof themes]?.button}`}
                           onClick={() => handleSpeak(selectedWord.english)}
                         >
                           <Volume2 className="h-4 w-4" />
@@ -426,19 +429,19 @@ export default function WordsPage() {
             </div>
           </>
         ) : quizMode ? (
-          <Card className="w-full max-w-2xl mx-auto">
+          <Card className={`w-full max-w-2xl mx-auto ${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder}`}>
             <CardHeader>
-              <CardTitle className="text-2xl">単語クイズ</CardTitle>
+              <CardTitle className={`text-2xl ${themes[theme as keyof typeof themes]?.cardText}`}>単語クイズ</CardTitle>
               <Progress value={(currentQuestionIndex / quizQuestions.length) * 100} className="mt-2" />
             </CardHeader>
             <CardContent className="p-6">
-              <h2 className="text-3xl font-bold mb-6 text-center">{quizQuestions[currentQuestionIndex].word.english}</h2>
+              <h2 className={`text-3xl font-bold mb-6 text-center ${themes[theme as keyof typeof themes]?.cardText}`}>{quizQuestions[currentQuestionIndex].word.english}</h2>
               <div className="grid grid-cols-2 gap-4">
                 {quizQuestions[currentQuestionIndex].options.map((option, index) => (
                   <Button 
                     key={index} 
                     onClick={() => handleAnswer(option)}
-                    className="py-8 text-lg"
+                    className={`py-8 text-lg ${themes[theme as keyof typeof themes]?.button}`}
                   >
                     {option}
                   </Button>
@@ -450,18 +453,18 @@ export default function WordsPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="w-full max-w-2xl mx-auto">
+          <Card className={`w-full max-w-2xl mx-auto ${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder}`}>
             <CardHeader>
-              <CardTitle className="text-2xl text-center">クイズ結果</CardTitle>
+              <CardTitle className={`text-2xl text-center ${themes[theme as keyof typeof themes]?.cardText}`}>クイズ結果</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <h2 className="text-4xl font-bold text-center mb-6">
+              <h2 className={`text-4xl font-bold text-center mb-6 ${themes[theme as keyof typeof themes]?.cardText}`}>
                 スコア: {score} / {quizQuestions.length}
               </h2>
               <Progress value={(score / quizQuestions.length) * 100} className="mb-6" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {quizQuestions.map((question, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                  <div key={index} className={`flex items-center justify-between p-2 border rounded ${themes[theme as keyof typeof themes]?.cardText}`}>
                     <span className="mr-2 flex-grow">{question.word.english}</span>
                     <span className="flex-shrink-0">
                       {answers[index] ? (
@@ -474,7 +477,7 @@ export default function WordsPage() {
                 ))}
               </div>
               <div className="flex justify-center">
-                <Button onClick={resetQuiz} className="px-8 py-4 text-lg">
+                <Button onClick={resetQuiz} className={`px-8 py-4 text-lg ${themes[theme as keyof typeof themes]?.button}`}>
                   単語リストに戻る
                 </Button>
               </div>
