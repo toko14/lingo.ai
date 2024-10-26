@@ -13,14 +13,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Volume2 } from 'lucide-react'
 import { useSpeech } from '@/hooks/useSpeech'
 import { Progress } from '@/components/ui/progress'
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, Trash2 } from 'lucide-react'
 import { useTheme } from "next-themes"
 import { themes } from "@/styles/themes"
 
 // ... 単語データの型定義とサンプルデータは同じ ...
 
 interface Word {
-  id: string;
+  id: number;  // 文字列から数値に変更
   english: string;
   japanese: string;
   partOfSpeech: string;
@@ -30,7 +30,7 @@ interface Word {
 // サンプルデータの追加
 const words: Word[] = [
   {
-    id: "1",
+    id: 1,
     english: "hello",
     japanese: "こんにちは",
     partOfSpeech: "動詞",
@@ -42,126 +42,126 @@ const words: Word[] = [
 // ダミーデータの追加
 const dummyWords: Word[] = [
   {
-    id: "1",
+    id: 1,
     english: "appreciate",
     japanese: "感謝する、理解する",
     partOfSpeech: "動詞",
     example: "I really appreciate your help with this project."
   },
   {
-    id: "2",
+    id: 2,
     english: "magnificent",
     japanese: "壮大な、素晴らしい",
     partOfSpeech: "形容詞",
     example: "The view from the mountain top was magnificent."
   },
   {
-    id: "3",
+    id: 3,
     english: "endeavor",
     japanese: "努力、試み",
     partOfSpeech: "名詞/動詞",
     example: "She will endeavor to finish the task by tomorrow."
   },
   {
-    id: "4",
+    id: 4,
     english: "resilient",
     japanese: "回復力のある、強靭な",
     partOfSpeech: "形容詞",
     example: "Children are often more resilient than adults."
   },
   {
-    id: "5",
+    id: 5,
     english: "serendipity",
     japanese: "幸運な偶然",
     partOfSpeech: "名詞",
     example: "Meeting my best friend was pure serendipity."
   },
   {
-    id: "6",
+    id: 6,
     english: "meticulous",
     japanese: "綿密な、几帳面な",
-    partOfSpeech: "形容詞",
+    partOfSpeech: "形容",
     example: "He is meticulous about keeping his records organized."
   },
   {
-    id: "7",
+    id: 7,
     english: "profound",
     japanese: "深い、深遠な",
     partOfSpeech: "形容詞",
     example: "The book had a profound impact on my thinking."
   },
   {
-    id: "8",
+    id: 8,
     english: "versatile",
     japanese: "多才な、汎用性のある",
     partOfSpeech: "形容詞",
     example: "This tool is very versatile and can be used for many purposes."
   },
   {
-    id: "9",
+    id: 9,
     english: "eloquent",
     japanese: "雄弁な、説得力のある",
     partOfSpeech: "形容詞",
     example: "She gave an eloquent speech that moved the entire audience."
   },
   {
-    id: "10",
+    id: 10,
     english: "diligent",
     japanese: "勤勉な、熱心な",
     partOfSpeech: "形容詞",
     example: "His diligent study habits helped him achieve excellent grades."
   },
   {
-    id: "11",
+    id: 11,
     english: "benevolent",
     japanese: "慈悲深い、親切な",
     partOfSpeech: "形容詞",
     example: "The benevolent king was loved by all his subjects."
   },
   {
-    id: "12",
+    id: 12,
     english: "perseverance",
     japanese: "忍耐力、粘り強さ",
     partOfSpeech: "名詞",
     example: "Her perseverance in the face of adversity was admirable."
   },
   {
-    id: "13",
+    id: 13,
     english: "innovative",
     japanese: "革新的な",
     partOfSpeech: "形容",
     example: "The company is known for its innovative approach to problem-solving."
   },
   {
-    id: "14",
+    id: 14,
     english: "ambiguous",
     japanese: "曖昧な、多義的な",
     partOfSpeech: "形容詞",
     example: "The contract contained several ambiguous clauses that needed clarification."
   },
   {
-    id: "15",
+    id: 15,
     english: "tenacious",
     japanese: "粘り強い、しつこい",
     partOfSpeech: "形容詞",
     example: "She is known for her tenacious pursuit of her goals."
   },
   {
-    id: "16",
+    id: 16,
     english: "empathy",
     japanese: "共感、感情移入",
     partOfSpeech: "名詞",
     example: "A good counselor must have empathy for their clients."
   },
   {
-    id: "17",
+    id: 17,
     english: "pragmatic",
-    japanese: "実用的な、現実的な",
+    japanese: "実用的な、実的な",
     partOfSpeech: "形容詞",
     example: "We need a pragmatic solution to this problem."
   },
   {
-    id: "18",
+    id: 18,
     english: "enigma",
     japanese: "謎、不可解なもの",
     partOfSpeech: "名詞",
@@ -272,34 +272,37 @@ export default function WordsPage() {
         setWords(dummyWords)
         setIsDummyData(true)
         setSavedWordsCount(0)
-        setIsLoading(false)
         return
       }
 
-      const [{ data, error }, count] = await Promise.all([
-        supabase
-          .from('user_words')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .order('created_at', { ascending: false }),
-        fetchSavedWordsCount()
-      ])
+      const { data, error, count } = await supabase
+        .from('user_words')
+        .select('*', { count: 'exact' })
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
 
       if (error) throw error
 
-      setWords(data.map(word => ({
-        id: word.word_id.toString(),
+      console.log('データベースから取得したデータ:', data);
+
+      const formattedWords = data.map(word => ({
+        id: word.word_id,  // toString()を削除
         english: word.english,
         japanese: word.japanese,
         partOfSpeech: word.part_of_speech,
         example: word.example
-      })))
-      setSavedWordsCount(count)
+      }))
+
+      setWords(formattedWords)
+      setSavedWordsCount(count || 0)
       setIsDummyData(false)
+
+      console.log('フォーマットされた単語:', formattedWords);
+      console.log('単語数:', count);
 
     } catch (error) {
       console.error('単語の取得中にエラーが発生しました:', error)
-      setError('単語の取得に失敗しました')
+      setError('単語の取得に失敗しました: ' + (error as Error).message)
     } finally {
       setIsLoading(false)
     }
@@ -309,6 +312,49 @@ export default function WordsPage() {
   useEffect(() => {
     fetchWords()
   }, [])
+
+  // 単語を削除する関数を修正
+  const handleDeleteWord = async (word: Word) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setError('ログインが必要です')
+        return
+      }
+
+      console.log('削除リクエスト:', { word, userId: session.user.id , wordId: word.id });
+
+      // 削除操作を実行（.select()を削除）
+      const { error: deleteError } = await supabase
+        .from('user_words')
+        .delete()
+        .eq('user_id', session.user.id)
+        .eq('word_id', word.id)
+
+      console.log('削除結果:', { deleteError });
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      // 削除が成功した場合、ローカルの状態を更新
+      setWords(prevWords => prevWords.filter(w => w.id !== word.id));
+      setSelectedWord(null);
+      setSavedWordsCount(prev => prev - 1);
+
+      console.log('単語が正常に削除されました');
+      
+      // 最新のデータを再取得
+      await fetchWords();
+    } catch (error) {
+      console.error('単語の削除中にエラーが発生しました:', error)
+      setError('単語の削除に失敗しました: ' + (error as Error).message)
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className={`min-h-screen ${themes[theme as keyof typeof themes]?.background}`}>
@@ -350,7 +396,7 @@ export default function WordsPage() {
                   </CardTitle>
                   {isDummyData && (
                     <div className="text-sm text-yellow-600 dark:text-yellow-500">
-                      ※ これはサンプルデータです。単語を保存するにはログインしてください。
+                      ※ こはサンプルデータです。単語を保存するにはログインしてください。
                     </div>
                   )}
                 </CardHeader>
@@ -409,18 +455,28 @@ export default function WordsPage() {
                           </Badge>
                         </div>
                         <p className="mb-4">{selectedWord.example}</p>
-                        <Button 
-                          variant="outline" 
-                          className={`flex items-center gap-2 ${themes[theme as keyof typeof themes]?.button}`}
-                          onClick={() => handleSpeak(selectedWord.english)}
-                        >
-                          <Volume2 className="h-4 w-4" />
-                          発音を聞く
-                        </Button>
+                        <div className="flex justify-between items-center">
+                          <Button 
+                            variant="outline" 
+                            className={`flex items-center gap-2 ${themes[theme as keyof typeof themes]?.button}`}
+                            onClick={() => handleSpeak(selectedWord.english)}
+                          >
+                            <Volume2 className="h-4 w-4" />
+                            発音を聞く
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            className="flex items-center gap-2"
+                            onClick={() => handleDeleteWord(selectedWord)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            削除
+                          </Button>
+                        </div>
                       </motion.div>
                     ) : (
                       <div className="h-full flex items-center justify-center text-muted-foreground">
-                        単語を選択して詳細を表示
+                        単語を選択して詳細を表示する
                       </div>
                     )}
                   </AnimatePresence>
