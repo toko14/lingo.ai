@@ -26,6 +26,7 @@ export default function Header() {
   const [session, setSession] = useState<Session | null>(null);
   const [wordCount, setWordCount] = useState<number | null>(null);
   const supabase = createClientComponentClient();
+  const [logoNumber, setLogoNumber] = useState(1);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -86,13 +87,31 @@ export default function Header() {
     }
   }, [session, fetchWordCount]);
 
+  // コンポーネントマウント時にランダムなロゴを選択
+  useEffect(() => {
+    const randomNumber = Math.floor(Math.random() * 10) + 1;
+    setLogoNumber(randomNumber);
+  }, []);
+
   return (
     <>
       <header className={`${themes[theme as keyof typeof themes]?.background || ''} border-b transition-colors duration-200`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-full" />
-            <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
+            <Image 
+              src={`/logo${logoNumber}.png`} 
+              alt="Logo" 
+              width={60} 
+              height={60} 
+              className="shadow-lg"
+            />
+            <div className="ml-4 flex flex-col">
+              <span className={`text-4xl font-extrabold tracking-tight ${themes[theme as keyof typeof themes]?.text || ''}`}>
+                Lingo
+                <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">.ai</span>
+              </span>
+              <span className="text-sm text-muted-foreground">AIで学ぶ英単語</span>
+            </div>
           </Link>
           <nav className="flex space-x-2">
             <Button
