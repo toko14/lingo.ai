@@ -99,6 +99,18 @@ export default function WordList({
         return;
       }
 
+      // 現在の保存済み単語数を取得
+      const { count } = await supabase
+        .from('user_words')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', session.user.id);
+
+      // 単語数が200を超える場合は保存を中止
+      if (count && count >= 200) {
+        showNotification('単語帳の登録上限（200語）に達しています', 'error');
+        return;
+      }
+
       // まず既存の単語をチェック
       const { data: existingWord } = await supabase
         .from('user_words')
