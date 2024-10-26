@@ -6,6 +6,10 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
     },
+    experimental: {
+        // CSR bailoutの警告を無視
+        missingSuspenseWithCSRBailout: false
+    }
 };
 
 export default nextConfig;
