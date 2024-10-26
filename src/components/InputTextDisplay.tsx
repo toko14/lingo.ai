@@ -159,7 +159,7 @@ export default function InputTextDisplay({ text }: InputTextDisplayProps) {
     <Card className={`${themes[theme as keyof typeof themes]?.card} ${themes[theme as keyof typeof themes]?.cardBorder} border h-full flex flex-col`}>
       <CardHeader className="p-4">
         <CardTitle className={`text-2xl font-bold text-center ${themes[theme as keyof typeof themes]?.cardText}`}>
-          入力されたテキスト
+          テキスト
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col">

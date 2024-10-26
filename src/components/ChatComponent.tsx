@@ -89,7 +89,7 @@ export default function ChatComponent({ initialText = "" }: ChatComponentProps) 
     <Card className={`${themes[currentTheme as keyof typeof themes]?.card} ${themes[currentTheme as keyof typeof themes]?.cardBorder} border h-[600px] flex flex-col`}>
       <CardHeader className="p-4">
         <CardTitle className={`text-2xl font-bold text-center ${themes[currentTheme as keyof typeof themes]?.cardText}`}>
-          チャット
+          AIチャット
           {isWaitingForResponse && <span className="ml-2">応答待ち...</span>}
         </CardTitle>
       </CardHeader>
