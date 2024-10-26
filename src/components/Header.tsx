@@ -95,72 +95,69 @@ export default function Header() {
             <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
           </Link>
           <nav className="flex space-x-2">
-            {session && (
-              <>
-                <Link
-                  href="/words_page"
-                  className="text-sm font-medium transition-colors hover:text-primary flex items-center"
-                >
-                  My単語帳
-                  {wordCount !== null && (
-                    <Badge variant="secondary" className="ml-2 text-xs">
-                      {wordCount} / 200
-                    </Badge>
-                  )}
-                </Link>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex items-center">
-                      <Palette className="mr-2 h-4 w-4" />
-                      テーマ
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => setTheme('default')}>
-                      デフォルト
+            <Button
+              variant="ghost"
+              className="text-sm font-medium transition-colors hover:text-primary flex items-center"
+              onClick={() => router.push('/words_page')}
+            >
+              My単語帳
+              {session && wordCount !== null && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  {wordCount} / 200
+                </Badge>
+              )}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center">
+                  <Palette className="mr-2 h-4 w-4" />
+                  テーマ
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setTheme('default')}>
+                  デフォルト
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('light')}>
+                  ライト
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                  ダーク
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('nature')}>
+                  ネイチャー
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  ユーザー
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {!session ? (
+                  <>
+                    <DropdownMenuItem onClick={() => setShowLogin(true)}>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      ログイン
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme('light')}>
-                      ライト
+                    <DropdownMenuItem onClick={() => setShowSignUp(true)}>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      サインアップ
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme('dark')}>
-                      ダーク
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme('nature')}>
-                      ネイチャー
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      ユーザー
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {!session ? (
-                      <>
-                        <DropdownMenuItem onClick={() => setShowLogin(true)}>
-                          <LogIn className="mr-2 h-4 w-4" />
-                          ログイン
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setShowSignUp(true)}>
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          サインアップ
-                        </DropdownMenuItem>
-                      </>
-                    ) : (
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        ログアウト
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
+                  </>
+                ) : (
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    ログアウト
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
       </header>
