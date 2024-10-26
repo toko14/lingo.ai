@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { X } from 'lucide-react'
+import { useRouter } from 'next/navigation';
 
 interface LoginProps {
   onClose: () => void;
@@ -11,11 +12,40 @@ interface LoginProps {
 export default function Login({ onClose }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [currentPath, setCurrentPath] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    // コンポーネントがマウントされたときに現在のパスを保存
+    setCurrentPath(window.location.pathname);
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // ここに実際のログインロジックを実装します
-    console.log('ログイン処理:', { email, password });
+    try {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        // ログイン成功
+        alert('ログインに成功しました');
+        onClose();
+        // 現在のパスに戻る（ただし、現在のパスが空の場合はホームページに戻る）
+        router.push(currentPath || '/');
+      } else {
+        // ログイン失敗
+        const data = await response.json();
+        alert(data.error || 'ログインに失敗しました');
+      }
+    } catch (error) {
+      console.error('ログイン処理中にエラーが発生しました', error);
+      alert('ログイン処理中にエラーが発生しました');
+    }
   };
 
   return (

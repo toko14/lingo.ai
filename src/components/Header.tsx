@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ChevronDown, User, Book, Palette } from 'lucide-react'
+import { ChevronDown, User, Book, Palette, LogOut, LogIn, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import SignUp from '@/components/SignUp';
 import Login from '@/components/Login';
@@ -23,6 +23,23 @@ export default function Header() {
 
   const handleNavigateToWordList = () => {
     router.push('/words_page');
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/auth/logout', { method: 'POST' });
+      if (response.ok) {
+        // ログアウト成功時の処理
+        alert('ログアウトに成功しました');
+        router.push('/');
+      } else {
+        console.error('ログアウトに失敗しました');
+        alert('ログアウトに失敗しました');
+      }
+    } catch (error) {
+      console.error('ログアウト処理中にエラーが発生しました', error);
+      alert('ログアウト処理中にエラーが発生しました');
+    }
   };
 
   return (
@@ -71,10 +88,16 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => setShowLogin(true)}>
+                  <LogIn className="mr-2 h-4 w-4" />
                   ログイン
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowSignUp(true)}>
+                  <UserPlus className="mr-2 h-4 w-4" />
                   サインアップ
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  ログアウト
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
