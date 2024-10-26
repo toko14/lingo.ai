@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, User, Book, Palette } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import SignUp from '@/components/SignUp';
 import Login from '@/components/Login';
@@ -34,13 +34,16 @@ export default function Header() {
             <span className={`ml-2 text-xl font-bold ${themes[theme as keyof typeof themes]?.text || ''}`}>/&%#$??!!</span>
           </Link>
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleNavigateToWordList}>
+            <Button variant="outline" onClick={handleNavigateToWordList} className="flex items-center">
+              <Book className="mr-2 h-4 w-4" />
               My単語帳
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="flex items-center">
-                  テーマ <ChevronDown className="ml-2 h-4 w-4" />
+                  <Palette className="mr-2 h-4 w-4" />
+                  テーマ
+                  <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -58,8 +61,23 @@ export default function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" onClick={() => setShowLogin(true)}>ログイン</Button>
-            <Button variant="default" onClick={() => setShowSignUp(true)}>サインアップ</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  ユーザー
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setShowLogin(true)}>
+                  ログイン
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowSignUp(true)}>
+                  サインアップ
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

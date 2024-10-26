@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { X } from 'lucide-react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 interface SignUpProps {
   onClose: () => void;
@@ -12,11 +13,41 @@ export default function SignUp({ onClose }: SignUpProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const supabase = createClientComponentClient()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // ここに実際の認証ロジックを実装します
-    console.log('サインアップ処理:', { email, password });
+    if (password !== confirmPassword) {
+      alert('パスワードが一致しません');
+      return;
+    }
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        if (error.message.includes('User already registered')) {
+          alert('このメールアドレスは既に登録されています');
+        } else {
+          throw error;
+        }
+      } else if (data.user) {
+        alert("登録完了メールを確認してください");
+        onClose();
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(`エラーが発生しました: ${error.message}`);
+      } else {
+        alert("不明なエラーが発生しました");
+      }
+      console.error(error);
+    }
   };
 
   return (
